@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  img-resizer:
+    build: ../.
+    ports:
+      - 8080:8080
+
+  web:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./test/static:/static
+      - ./test/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  test:
+    image: golang:1.17
+    volumes:
+      - ./:/img-resize-tests/
+    working_dir: /img-resize-tests
+    command: sh -c 'go test -v  ./...'
+    depends_on:
+      - img-resizer
+      - web
